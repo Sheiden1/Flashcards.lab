@@ -1,28 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { Hero } from "./components/landing/Hero";
 import { HowItWorks } from "./components/landing/HowItWorks";
 import { Footer } from "./components/landing/Footer";
 import { GeneratorTabs } from "./components/generator/GeneratorTabs";
+import { GeneratorOptions } from "./components/generator/GeneratorOptions";
 import { TextPanel } from "./components/generator/TextPanel";
 import { UploadDropzone } from "./components/generator/UploadDropzone";
 import { PackOpeningAnimation } from "./components/generator/PackOpeningAnimation";
 import { FlashcardDeck } from "./components/generator/FlashcardDeck";
+import { RecentDecks } from "./components/generator/RecentDecks";
 import { ErrorCard } from "./components/generator/ErrorCard";
 import { useGeneratorStore } from "./store/generator.store";
 import { useGenerateFlashcards } from "./hooks/use-generate-flashcards";
 import { SAMPLE_DECK } from "./lib/sample-deck";
 import { resolveGenerateResult } from "./lib/generate-result";
+import {
+  saveRecentDeck,
+  clearRecentDecks,
+  subscribeRecentDecks,
+  getRecentDecksSnapshot,
+  getRecentDecksServerSnapshot,
+  type RecentDeck,
+} from "./lib/recent-decks";
 
 export default function Page() {
-  const { tab, count, cards, setCount, setCards, setStatus, status } =
-    useGeneratorStore();
+  const {
+    tab,
+    count,
+    options,
+    cards,
+    setCount,
+    setCards,
+    setOptions,
+    setStatus,
+    status,
+  } = useGeneratorStore();
   const [text, setText] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [toastRetryable, setToastRetryable] = useState(true);
+  const recentDecks = useSyncExternalStore(
+    subscribeRecentDecks,
+    getRecentDecksSnapshot,
+    getRecentDecksServerSnapshot,
+  );
   const mutation = useGenerateFlashcards();
 
   async function onGenerate() {
@@ -34,16 +58,34 @@ export default function Page() {
       count,
       text,
       file: file ?? undefined,
+      options,
     });
     const outcome = resolveGenerateResult(res);
     if (outcome.kind === "deck") {
       setCards(outcome.cards);
       setStatus("success");
+      saveRecentDeck({
+        createdAt: Date.now(),
+        cards: outcome.cards,
+        options,
+      });
     } else {
       setStatus("error");
       setToast(outcome.message);
       setToastRetryable(outcome.retryable);
     }
+  }
+
+  function onRestoreDeck(deck: RecentDeck) {
+    setToast(null);
+    setOptions(deck.options);
+    setCards(deck.cards);
+    setStatus("success");
+    window.scrollTo({ top: window.innerHeight, behavior: "smooth" });
+  }
+
+  function onClearRecent() {
+    clearRecentDecks();
   }
 
   function onShowSample() {
@@ -71,6 +113,7 @@ export default function Page() {
             onError={setFileError}
           />
         )}
+        <GeneratorOptions />
         <div className="flex items-center gap-3">
           <label htmlFor="count-range" className="whitespace-nowrap text-ink/70">
             Cards: {count}
@@ -98,7 +141,7 @@ export default function Page() {
               Gerando…
             </>
           ) : (
-            "Gerar deck"
+            "Gerar flashcards"
           )}
         </button>
         {toast && (
@@ -112,8 +155,13 @@ export default function Page() {
           onClick={onShowSample}
           className="w-full text-center text-sm text-ink/50 underline-offset-4 transition hover:text-ink/80 hover:underline"
         >
-          ou veja um deck de exemplo
+          Testar com exemplo
         </button>
+        <RecentDecks
+          decks={recentDecks}
+          onRestore={onRestoreDeck}
+          onClear={onClearRecent}
+        />
         <p className="sr-only" role="status" aria-live="polite">
           {status === "generating"
             ? "Gerando seu deck de flashcards…"

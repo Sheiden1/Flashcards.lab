@@ -7,10 +7,13 @@ export interface Flashcard {
   rarity: Rarity;
 }
 
+import type { GenerateOptions } from "@/app/lib/generate-options";
+
 export interface GenerateRequest {
   source: "text" | "pdf";
   text?: string;
   count: number;
+  options: GenerateOptions;
 }
 
 export type GenerateResponse =

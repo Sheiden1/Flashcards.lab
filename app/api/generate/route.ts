@@ -1,7 +1,12 @@
 import {
   textSchema,
+  optionsSchema,
   validatePdfFile,
 } from "@/app/lib/validation/generate.schema";
+import {
+  DEFAULT_OPTIONS,
+  type GenerateOptions,
+} from "@/app/lib/generate-options";
 import { extractText } from "@/app/lib/parsing/pdf";
 import { checkRateLimit } from "@/app/lib/rate-limit";
 import { geminiProvider } from "@/app/lib/ai/provider";
@@ -33,6 +38,7 @@ export async function POST(req: Request) {
   const contentType = req.headers.get("content-type") ?? "";
   let content: string;
   let count: number;
+  let options: GenerateOptions = DEFAULT_OPTIONS;
 
   try {
     if (contentType.includes("multipart/form-data")) {
@@ -53,6 +59,16 @@ export async function POST(req: Request) {
           status: 400,
         });
       }
+      const rawOptions = form.get("options");
+      if (typeof rawOptions === "string") {
+        const parsedOptions = optionsSchema.safeParse(JSON.parse(rawOptions));
+        if (!parsedOptions.success) {
+          return Response.json(fail("INVALID_INPUT", "Opções inválidas."), {
+            status: 400,
+          });
+        }
+        options = parsedOptions.data;
+      }
       content = await extractText(await file.arrayBuffer());
     } else {
       const body = await req.json();
@@ -64,6 +80,7 @@ export async function POST(req: Request) {
       }
       content = parsed.data.text;
       count = parsed.data.count;
+      options = parsed.data.options;
     }
   } catch (e) {
     const code =
@@ -78,7 +95,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const pairs = await geminiProvider.generateCards(content, count);
+    const pairs = await geminiProvider.generateCards(content, count, options);
     return Response.json(ok({ cards: assignRarity(pairs) }));
   } catch (e) {
     if (isAuthError(e)) {
