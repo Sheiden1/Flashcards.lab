@@ -1,24 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const THEME_EVENT = "themechange";
+
+function subscribe(callback: () => void) {
+  window.addEventListener(THEME_EVENT, callback);
+  return () => window.removeEventListener(THEME_EVENT, callback);
+}
+
+function getSnapshot(): "light" | "dark" {
+  return document.documentElement.classList.contains("light")
+    ? "light"
+    : "dark";
+}
+
+function getServerSnapshot(): "light" | "dark" {
+  // SSR sempre renderiza dark (padrão da marca); o script anti-flash ajusta
+  // a classe no cliente e o useSyncExternalStore re-renderiza sem mismatch.
+  return "dark";
+}
 
 export function ThemeToggle() {
-  // Inicializa a partir do que o script anti-flash já aplicou no <html>.
-  const [dark, setDark] = useState(true);
-
-  useEffect(() => {
-    setDark(!document.documentElement.classList.contains("light"));
-  }, []);
+  const theme = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+  const dark = theme === "dark";
 
   function toggle() {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle("light", !next);
+    const nextLight = dark;
+    document.documentElement.classList.toggle("light", nextLight);
     try {
-      localStorage.setItem("theme", next ? "dark" : "light");
+      localStorage.setItem("theme", nextLight ? "light" : "dark");
     } catch {
       // localStorage indisponível — segue sem persistir
     }
+    window.dispatchEvent(new Event(THEME_EVENT));
   }
 
   return (
