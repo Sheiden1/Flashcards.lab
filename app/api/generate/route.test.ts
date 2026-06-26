@@ -15,7 +15,10 @@ vi.mock("@/app/lib/ai/provider", () => ({
 import { POST } from "./route";
 import { __reset } from "@/app/lib/rate-limit";
 
-beforeEach(() => __reset());
+beforeEach(() => {
+  __reset();
+  process.env.GEMINI_API_KEY = "test-key";
+});
 
 function jsonRequest(body: unknown, ip = "1.2.3.4") {
   return new Request("http://localhost/api/generate", {
@@ -60,4 +63,13 @@ test("aplica rate limit após 10 gerações do mesmo IP", async () => {
   const json = await res.json();
   expect(res.status).toBe(429);
   expect(json.error.code).toBe("RATE_LIMITED");
+});
+
+test("sem GEMINI_API_KEY → CONFIG_ERROR (503)", async () => {
+  delete process.env.GEMINI_API_KEY;
+  const res = await POST(jsonRequest({ text: "ok", count: 5 }));
+  const json = await res.json();
+  expect(res.status).toBe(503);
+  expect(json.success).toBe(false);
+  expect(json.error.code).toBe("CONFIG_ERROR");
 });

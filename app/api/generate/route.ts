@@ -9,6 +9,18 @@ import { assignRarity } from "@/app/lib/rarity";
 import { ok, fail } from "@/app/lib/http/envelope";
 
 export async function POST(req: Request) {
+  // Falha cedo e com mensagem clara se o servidor não tiver a chave do Gemini
+  // (causa comum em deploy: variável de ambiente não configurada na Vercel).
+  if (!process.env.GEMINI_API_KEY?.trim()) {
+    return Response.json(
+      fail(
+        "CONFIG_ERROR",
+        "A IA não está configurada no servidor (falta a GEMINI_API_KEY).",
+      ),
+      { status: 503 },
+    );
+  }
+
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "local";
   if (!checkRateLimit(ip)) {
     return Response.json(
