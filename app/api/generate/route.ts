@@ -5,6 +5,7 @@ import {
 import { extractText } from "@/app/lib/parsing/pdf";
 import { checkRateLimit } from "@/app/lib/rate-limit";
 import { geminiProvider } from "@/app/lib/ai/provider";
+import { isAuthError } from "@/app/lib/ai/classify-error";
 import { assignRarity } from "@/app/lib/rarity";
 import { ok, fail } from "@/app/lib/http/envelope";
 
@@ -79,7 +80,16 @@ export async function POST(req: Request) {
   try {
     const pairs = await geminiProvider.generateCards(content, count);
     return Response.json(ok({ cards: assignRarity(pairs) }));
-  } catch {
+  } catch (e) {
+    if (isAuthError(e)) {
+      return Response.json(
+        fail(
+          "INVALID_API_KEY",
+          "Chave de IA inválida ou sem permissão. Verifique a GEMINI_API_KEY.",
+        ),
+        { status: 502 },
+      );
+    }
     return Response.json(fail("AI_ERROR", "Erro ao gerar, tente de novo."), {
       status: 502,
     });
