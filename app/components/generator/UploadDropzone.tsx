@@ -48,8 +48,23 @@ export function UploadDropzone({
         Escolher PDF
       </label>
       <p className="mt-2 text-sm">
-        {file ? file.name : "ou arraste aqui (máx 2MB)"}
+        {file ? file.name : "ou arraste aqui — tamanho máximo 2 MB"}
       </p>
+      {!file && (
+        <p className="mt-1 text-xs text-ink/50">
+          Acima de 2 MB? Comprima em{" "}
+          <a
+            href="https://www.ilovepdf.com/pt/comprimir_pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline underline-offset-2 hover:text-holo"
+            onClick={(e) => e.stopPropagation()}
+          >
+            iLovePDF
+          </a>
+          .
+        </p>
+      )}
       {error && <p className="mt-1 text-sm text-holo">{error}</p>}
     </div>
   );

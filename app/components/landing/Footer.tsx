@@ -6,7 +6,7 @@ export function Footer() {
           FLASHCARDS LAB
         </span>
         <p className="text-sm text-ink/40">
-          Gerado com IA · sem login, nada é salvo entre sessões
+          © 2026 Flashcards Lab. Todos os direitos reservados.
         </p>
       </div>
     </footer>

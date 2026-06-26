@@ -11,11 +11,11 @@ export function Hero() {
       </div>
       <h1 className="mt-16 font-display text-4xl font-bold leading-[1.1] text-ink sm:text-6xl">
         Transforme qualquer conteúdo em{" "}
-        <span className="holo-text">cartas de estudo</span>
+        <span className="holo-text">flashcards de estudo</span>
       </h1>
       <p className="mx-auto mt-5 max-w-md text-ink/75">
-        Cole um texto ou envie um PDF. A IA monta seu deck de flashcards —
-        cada carta com sua raridade.
+        Cole um texto ou suba um PDF e tenha um baralho pronto para revisar
+        em segundos.
       </p>
     </header>
   );
