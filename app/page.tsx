@@ -68,15 +68,18 @@ export default function Page() {
           />
         )}
         <div className="flex items-center gap-3">
-          <label className="whitespace-nowrap text-ink/70">
+          <label htmlFor="count-range" className="whitespace-nowrap text-ink/70">
             Cards: {count}
           </label>
           <input
+            id="count-range"
             type="range"
             min={5}
             max={20}
             value={count}
             onChange={(e) => setCount(Number(e.target.value))}
+            aria-label="Quantidade de cartas a gerar"
+            aria-valuetext={`${count} cartas`}
             className="flex-1 accent-primary"
           />
         </div>
@@ -103,6 +106,15 @@ export default function Page() {
         >
           ou veja um deck de exemplo
         </button>
+        <p className="sr-only" role="status" aria-live="polite">
+          {status === "generating"
+            ? "Gerando seu deck de flashcards…"
+            : status === "success" && cards.length > 0
+              ? `Deck gerado com ${cards.length} cartas.`
+              : status === "error"
+                ? "Erro ao gerar o deck."
+                : ""}
+        </p>
       </section>
       {status === "generating" && <PackOpeningAnimation />}
       <FlashcardDeck />

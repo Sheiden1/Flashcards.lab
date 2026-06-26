@@ -15,6 +15,7 @@ export function TextPanel({
         value={value}
         onChange={(e) => onChange(e.target.value.slice(0, MAX_TEXT))}
         placeholder="Cole seu conteúdo aqui…"
+        aria-label="Conteúdo para gerar flashcards"
         className="h-48 w-full resize-none rounded-xl border border-primary/30 bg-surface p-4 text-ink outline-none focus:border-primary"
       />
       <p className="mt-1 text-right text-sm text-ink/50">
