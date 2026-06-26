@@ -107,11 +107,13 @@ export default function OpengraphImage() {
                   alignItems: "flex-start",
                   justifyContent: "flex-end",
                   padding: 10,
-                  color: "#B026FF",
-                  fontSize: 22,
                 }}
               >
-                {c.holo ? "✦" : ""}
+                {c.holo ? (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="#B026FF">
+                    <path d="M12 3l1.9 4 4.4.6-3.2 3.1.8 4.3L12 13l-3.9 2 .8-4.3L5.7 7.6 10.1 7 12 3z" />
+                  </svg>
+                ) : null}
               </div>
             </div>
           ))}
