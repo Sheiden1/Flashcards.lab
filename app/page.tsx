@@ -33,9 +33,15 @@ export default function Page() {
       text,
       file: file ?? undefined,
     });
-    if (res.success) {
+    if (res.success && res.data.cards.length > 0) {
       setCards(res.data.cards);
       setStatus("success");
+    } else if (res.success) {
+      // Sucesso, mas a IA não devolveu cartas (conteúdo curto/ambíguo).
+      setStatus("error");
+      setToast(
+        "Não consegui montar cartas desse conteúdo. Tente um texto mais detalhado.",
+      );
     } else {
       setStatus("error");
       setToast(res.error.message);
