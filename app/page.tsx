@@ -22,6 +22,7 @@ export default function Page() {
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [toastRetryable, setToastRetryable] = useState(true);
   const mutation = useGenerateFlashcards();
 
   async function onGenerate() {
@@ -41,6 +42,7 @@ export default function Page() {
     } else {
       setStatus("error");
       setToast(outcome.message);
+      setToastRetryable(outcome.retryable);
     }
   }
 
@@ -100,7 +102,11 @@ export default function Page() {
           )}
         </button>
         {toast && (
-          <ErrorCard message={toast} onDismiss={() => setToast(null)} />
+          <ErrorCard
+            message={toast}
+            retryable={toastRetryable}
+            onDismiss={() => setToast(null)}
+          />
         )}
         <button
           onClick={onShowSample}

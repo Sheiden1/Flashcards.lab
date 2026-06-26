@@ -2,9 +2,11 @@
 
 export function ErrorCard({
   message,
+  retryable = true,
   onDismiss,
 }: {
   message: string;
+  retryable?: boolean;
   onDismiss: () => void;
 }) {
   return (
@@ -18,7 +20,7 @@ export function ErrorCard({
         onClick={onDismiss}
         className="mt-4 rounded-lg border border-primary/50 px-4 py-1.5 text-sm text-ink/80 transition hover:bg-primary hover:text-white"
       >
-        Tentar de novo
+        {retryable ? "Tentar de novo" : "Entendi"}
       </button>
     </div>
   );
