@@ -13,6 +13,7 @@ import { ErrorCard } from "./components/generator/ErrorCard";
 import { useGeneratorStore } from "./store/generator.store";
 import { useGenerateFlashcards } from "./hooks/use-generate-flashcards";
 import { SAMPLE_DECK } from "./lib/sample-deck";
+import { resolveGenerateResult } from "./lib/generate-result";
 
 export default function Page() {
   const { tab, count, cards, setCount, setCards, setStatus, status } =
@@ -33,18 +34,13 @@ export default function Page() {
       text,
       file: file ?? undefined,
     });
-    if (res.success && res.data.cards.length > 0) {
-      setCards(res.data.cards);
+    const outcome = resolveGenerateResult(res);
+    if (outcome.kind === "deck") {
+      setCards(outcome.cards);
       setStatus("success");
-    } else if (res.success) {
-      // Sucesso, mas a IA não devolveu cartas (conteúdo curto/ambíguo).
-      setStatus("error");
-      setToast(
-        "Não consegui montar cartas desse conteúdo. Tente um texto mais detalhado.",
-      );
     } else {
       setStatus("error");
-      setToast(res.error.message);
+      setToast(outcome.message);
     }
   }
 
