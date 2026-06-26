@@ -1,0 +1,306 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0A0A0F;
+  --color-surface: #15121F;
+  --color-primary: #7C3AED;
+  --color-holo: #B026FF;
+  --color-ink: #F4F2F8;
+
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Light theme overrides (toggled via html.light) */
+html.light {
+  --color-bg: #FFFFFF;
+  --color-surface: #F4F0FA;
+  --color-ink: #1A1625;
+  color-scheme: light;
+}
+
+html {
+  color-scheme: dark;
+  background: var(--color-bg);
+}
+
+body {
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* Holographic shimmering text (logo / accents) */
+.holo-text {
+  background: linear-gradient(
+    100deg,
+    #7C3AED 0%,
+    #B026FF 25%,
+    #38bdf8 50%,
+    #B026FF 75%,
+    #7C3AED 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: holoShift 6s linear infinite;
+}
+
+@keyframes holoShift {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* Background ambiance: drifting holographic auroras + film grain */
+.aurora {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(110px);
+  opacity: 0.38;
+  mix-blend-mode: screen;
+}
+
+/* Readability veil: tones the auroras down to a consistent base behind content */
+.veil {
+  position: absolute;
+  inset: 0;
+  background: var(--color-bg);
+  opacity: 0.4;
+}
+
+html.light .veil {
+  opacity: 0.62;
+}
+
+.aurora-1 {
+  width: 50vw;
+  height: 50vw;
+  top: -10vw;
+  left: -8vw;
+  background: radial-gradient(circle, #7C3AED, transparent 65%);
+  animation: drift1 22s ease-in-out infinite;
+}
+
+.aurora-2 {
+  width: 45vw;
+  height: 45vw;
+  top: 10vw;
+  right: -10vw;
+  background: radial-gradient(circle, #B026FF, transparent 65%);
+  animation: drift2 28s ease-in-out infinite;
+}
+
+.aurora-3 {
+  width: 40vw;
+  height: 40vw;
+  bottom: -15vw;
+  left: 30vw;
+  background: radial-gradient(circle, #38bdf8, transparent 65%);
+  opacity: 0.3;
+  animation: drift3 32s ease-in-out infinite;
+}
+
+html.light .aurora {
+  opacity: 0.14;
+}
+
+@keyframes drift1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(8vw, 6vw) scale(1.15); }
+}
+@keyframes drift2 {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  50% { transform: translate(-6vw, 8vw) scale(0.95); }
+}
+@keyframes drift3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-8vw, -6vw) scale(1.2); }
+}
+
+.grain {
+  position: absolute;
+  inset: -50%;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Signature pack-opening entrance */
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) rotateX(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+.card-enter {
+  opacity: 0;
+  animation: cardEnter 0.5s ease forwards;
+}
+
+/* Pointer-driven 3D tilt (--rx/--ry set in JS) */
+.card-tilt {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+  will-change: transform;
+}
+
+/* Holographic rare card border + glow */
+.holo-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    linear-gradient(135deg, var(--color-primary), var(--color-holo)) border-box;
+}
+
+.holo-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(176, 38, 255, 0.25),
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Refractive foil: rainbow diffraction lines that shift with the tilt */
+.holo-foil {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    115deg,
+    rgba(255, 0, 132, 0.35) 0%,
+    rgba(124, 58, 237, 0.35) 12%,
+    rgba(56, 189, 248, 0.35) 24%,
+    rgba(74, 222, 128, 0.35) 36%,
+    rgba(250, 204, 21, 0.35) 48%,
+    rgba(255, 0, 132, 0.35) 60%
+  );
+  background-size: 220% 220%;
+  background-position: calc(var(--mx, 50%) * 1.4) calc(var(--my, 0%) * 1.4);
+  mix-blend-mode: color-dodge;
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
+}
+
+.group:hover .holo-foil {
+  opacity: 0.6;
+}
+
+/* Specular glare: a tight white highlight that slides with the tilt */
+.holo-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 0%),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0.08) 18%,
+    transparent 35%
+  );
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.group:hover .holo-glare {
+  opacity: 1;
+}
+
+/* Holographic sheen that follows the pointer (--mx/--my set in JS) */
+.holo-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at var(--mx, 50%) var(--my, 0%),
+      rgba(176, 38, 255, 0.45),
+      transparent 45%
+    ),
+    conic-gradient(
+      from 0deg at var(--mx, 50%) var(--my, 0%),
+      rgba(124, 58, 237, 0.35),
+      rgba(176, 38, 255, 0.35),
+      rgba(56, 189, 248, 0.3),
+      rgba(124, 58, 237, 0.35)
+    );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.group:hover .holo-shine {
+  opacity: 1;
+}
+
+/* Pack-opening burst behind the generating state */
+@keyframes packBurst {
+  0% {
+    transform: scale(0.6) rotate(0deg);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.1) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.6) rotate(360deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes packPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px 4px rgba(176, 38, 255, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 40px 12px rgba(124, 58, 237, 0.6);
+  }
+}
+
+.pack-core {
+  animation: packPulse 1.2s ease-in-out infinite;
+}
+
+.pack-ring {
+  animation: packBurst 1.6s linear infinite;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .card-enter {
+    opacity: 1;
+    animation: none;
+  }
+  .pack-core,
+  .pack-ring,
+  .aurora {
+    animation: none;
+  }
+  .holo-shine,
+  .holo-foil,
+  .holo-glare {
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
