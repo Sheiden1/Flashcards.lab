@@ -1,7 +1,5 @@
-onlyBuiltDependencies:
-  - esbuild
-  - '@google/genai'
-  - protobufjs
-  - sharp
-  - unrs-resolver
+# Os scripts de build nativos (sharp, unrs-resolver, etc.) não são necessários
+# para lint/test/build aqui, então mantemos ignored-builds como aviso (não erro)
+# e desligamos o pre-check de deps antes de cada `pnpm run`.
+strictDepBuilds: false
 verifyDepsBeforeRun: false
