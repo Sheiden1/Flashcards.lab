@@ -7,6 +7,7 @@ import {
   downloadDeckImage,
 } from "@/app/lib/export/card-image";
 import { downloadAnkiDeck } from "@/app/lib/export/anki";
+import { nextFocusIndex, isArrowKey } from "@/app/lib/grid-nav";
 import { FlashcardCard } from "./FlashcardCard";
 
 export function FlashcardDeck() {
@@ -32,8 +33,7 @@ export function FlashcardDeck() {
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
-    const keys = ["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"];
-    if (!keys.includes(e.key)) return;
+    if (!isArrowKey(e.key)) return;
     const grid = gridRef.current;
     if (!grid) return;
     const buttons = Array.from(
@@ -45,13 +45,8 @@ export function FlashcardDeck() {
       e.preventDefault();
       return;
     }
-    const cols = columnCount();
-    let next = current;
-    if (e.key === "ArrowRight") next = current + 1;
-    else if (e.key === "ArrowLeft") next = current - 1;
-    else if (e.key === "ArrowDown") next = current + cols;
-    else if (e.key === "ArrowUp") next = current - cols;
-    if (next >= 0 && next < buttons.length) {
+    const next = nextFocusIndex(current, e.key, columnCount(), buttons.length);
+    if (next !== current) {
       buttons[next]?.focus();
       e.preventDefault();
     }
