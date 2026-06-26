@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Hero } from "./components/landing/Hero";
 import { HowItWorks } from "./components/landing/HowItWorks";
 import { Footer } from "./components/landing/Footer";
@@ -12,7 +12,10 @@ import { PackOpeningAnimation } from "./components/generator/PackOpeningAnimatio
 import { FlashcardDeck } from "./components/generator/FlashcardDeck";
 import { RecentDecks } from "./components/generator/RecentDecks";
 import { ErrorCard } from "./components/generator/ErrorCard";
-import { useGeneratorStore } from "./store/generator.store";
+import {
+  useGeneratorStore,
+  hydrateGeneratorOptions,
+} from "./store/generator.store";
 import { useGenerateFlashcards } from "./hooks/use-generate-flashcards";
 import { SAMPLE_DECK } from "./lib/sample-deck";
 import { resolveGenerateResult } from "./lib/generate-result";
@@ -48,6 +51,11 @@ export default function Page() {
     getRecentDecksServerSnapshot,
   );
   const mutation = useGenerateFlashcards();
+
+  // Reidrata as opções salvas no localStorage (só no cliente, após montar).
+  useEffect(() => {
+    hydrateGeneratorOptions();
+  }, []);
 
   async function onGenerate() {
     setStatus("generating");

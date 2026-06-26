@@ -50,6 +50,19 @@ export const FOCUS_OPTIONS: Option<Focus>[] = [
   { value: "resumo", label: "Resumo geral" },
 ];
 
+const labelOf = <T extends string>(opts: Option<T>[], value: T): string =>
+  opts.find((o) => o.value === value)?.label ?? value;
+
+/** Resumo curto das opções para exibir no card recolhido. */
+export function summarizeOptions(o: GenerateOptions): string {
+  return [
+    labelOf(DEPTH_OPTIONS, o.depth),
+    labelOf(CARD_TYPE_OPTIONS, o.cardType),
+    labelOf(DIFFICULTY_OPTIONS, o.difficulty),
+    labelOf(FOCUS_OPTIONS, o.focus),
+  ].join(" · ");
+}
+
 const DEPTH_VALUES = DEPTH_OPTIONS.map((o) => o.value);
 const CARD_TYPE_VALUES = CARD_TYPE_OPTIONS.map((o) => o.value);
 const DIFFICULTY_VALUES = DIFFICULTY_OPTIONS.map((o) => o.value);
