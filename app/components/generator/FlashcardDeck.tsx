@@ -37,7 +37,7 @@ export function FlashcardDeck() {
     const grid = gridRef.current;
     if (!grid) return;
     const buttons = Array.from(
-      grid.querySelectorAll<HTMLButtonElement>("button"),
+      grid.querySelectorAll<HTMLButtonElement>("button:not([data-skip-nav])"),
     );
     const current = buttons.findIndex((b) => b === document.activeElement);
     if (current === -1) {
